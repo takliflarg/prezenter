@@ -8,6 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PrezenterServer</RootNamespace>
     <AssemblyName>PrezenterServer</AssemblyName>
+    <!-- Windows-only (WPF) loyihani Linux/macOS'da ham build qilish uchun kerak -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
