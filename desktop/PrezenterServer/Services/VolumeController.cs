@@ -1,3 +1,4 @@
+using System;
 using NAudio.CoreAudioApi;
 
 namespace PrezenterServer.Services;
