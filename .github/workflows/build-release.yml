@@ -51,7 +51,13 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest runnerlarida Android SDK oldindan o'rnatilgan bo'ladi
+      # (ANDROID_HOME orqali) - alohida setup-android action shart emas,
+      # faqat kerakli platform/build-tools mavjudligini ta'minlaymiz.
+      - name: Ensure required Android SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Build debug APK
         working-directory: android
