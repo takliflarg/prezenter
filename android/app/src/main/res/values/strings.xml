@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Prezenter</string>
+    <string name="notification_channel_name">Taqdimot rejimi</string>
+    <string name="notification_title">Prezenter faol</string>
+    <string name="notification_text">Tovush tugmalari slaydni boshqarmoqda</string>
+</resources>

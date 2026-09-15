@@ -1,0 +1,23 @@
+<Window x:Class="PrezenterServer.Overlay.LaserOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Prezenter Laser Overlay"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual">
+    <Canvas x:Name="RootCanvas">
+        <Ellipse x:Name="LaserDot"
+                 Width="26" Height="26"
+                 Fill="#FFFF3B30"
+                 Opacity="0.85"
+                 Visibility="Collapsed">
+            <Ellipse.Effect>
+                <DropShadowEffect Color="#FFFF3B30" BlurRadius="24" ShadowDepth="0" Opacity="0.9" />
+            </Ellipse.Effect>
+        </Ellipse>
+    </Canvas>
+</Window>
