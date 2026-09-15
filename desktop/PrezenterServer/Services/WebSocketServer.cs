@@ -13,7 +13,7 @@ namespace PrezenterServer.Services;
 public sealed class WebSocketServer : IAsyncDisposable
 {
     public const int Port = 9091;
-    private const string UrlPrefix = $"http://+:{Port}/prezenter/";
+    private static readonly string UrlPrefix = $"http://+:{Port}/prezenter/";
 
     private readonly HttpListener _listener = new();
     private readonly CommandDispatcher _dispatcher;
