@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.prezenter.app.network.PairingPayload
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 /**
