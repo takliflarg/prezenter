@@ -26,6 +26,15 @@ yuklab oling:
 - `Prezenter-Server-Windows-x64.exe` - Windows 11 (x64) kompyuterga
   o'rnatish shart emas, faylni ishga tushirish kifoya (o'z-o'zini
   ta'minlovchi, .NET runtime alohida o'rnatilmasa ham ishlaydi).
+  - **"Windows dasturingizni himoya qildi" (SmartScreen) ogohlantirishi
+    chiqsa** - bu normal holat, chunki `.exe` pullik raqamli sertifikat
+    bilan imzolanmagan. **"Batafsil ma'lumot" → "Baribir ishga tushirish"**
+    tugmasini bosing.
+  - **Ishga tushirilganda UAC (administrator) so'rovi chiqadi** - "Ha"
+    deb tasdiqlang. Bu shart, chunki dastur tarmoqdagi barcha
+    qurilmalardan ulanishni qabul qilish uchun (`http://+:9091`)
+    administrator huquqi bilan ishlashi kerak - aks holda dastur churq
+    etmay yopilib qoladi.
 - `Prezenter-Android.apk` - Android telefonga o'rnatish uchun (avval
   "Noma'lum manbalardan o'rnatish"ga ruxsat bering).
 

@@ -10,6 +10,8 @@
     <AssemblyName>PrezenterServer</AssemblyName>
     <!-- Windows-only (WPF) loyihani Linux/macOS'da ham build qilish uchun kerak -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- HttpListener "+" (barcha interfeys) manzilida tinglashi uchun admin huquqi kerak -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
