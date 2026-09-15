@@ -27,7 +27,7 @@ object LaserAction {
 @Serializable
 data class PairRequest(
     val type: String = "pair",
-    val token: String,
+    val token: String? = null,
     val deviceName: String
 )
 
@@ -63,15 +63,21 @@ data class InboundEnvelope(
     val connected: Boolean? = null,
     val computerName: String? = null,
     val muted: Boolean? = null,
-    val volume: Int? = null
+    val volume: Int? = null,
+    /** Faqat tarmoqdan avtomatik topilib, PC'da yangi tasdiqlanganda keladi. */
+    val token: String? = null
 )
 
-/** QR kod ichidagi pairing payloadi (Windows MainWindow shu shaklda generatsiya qiladi). */
+/**
+ * Pairing payloadi. QR flow'da `token` QR koddan olinadi; tarmoqdan
+ * avtomatik topilgan (hali tasdiqlanmagan) kompyuterga ulanishda
+ * `token = null` - server bu holda PC foydalanuvchisidan tasdiq so'raydi.
+ */
 @Serializable
 data class PairingPayload(
     val ip: String,
     val port: Int,
-    val token: String
+    val token: String? = null
 )
 
 /** NSD orqali topilgan kompyuter. */

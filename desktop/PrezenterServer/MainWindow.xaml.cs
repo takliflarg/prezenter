@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using PrezenterServer.Models;
 using PrezenterServer.Services;
 using QRCoder;
 
@@ -27,6 +28,7 @@ public partial class MainWindow : Window
         _server.DeviceConnected += OnDeviceConnected;
         _server.DeviceDisconnected += OnDeviceDisconnected;
         _pairingManager.DeviceApproved += OnDeviceApproved;
+        _pairingManager.ApprovalRequested += OnApprovalRequested;
 
         RefreshDevicesList();
         GenerateAndShowQrCode();
@@ -100,6 +102,42 @@ public partial class MainWindow : Window
     }
 
     private void OnDeviceApproved(ApprovedDevice device) => Dispatcher.Invoke(RefreshDevicesList);
+
+    /// <summary>
+    /// Tokensiz (tarmoqdan avtomatik topilgan) qurilmadan ulanish so'rovi
+    /// keldi - foydalanuvchidan "Ruxsat berilsinmi?" deb so'raymiz va
+    /// javobni aynan o'sha telefonga qaytaramiz.
+    /// </summary>
+    private void OnApprovalRequested(string connectionId, string deviceName)
+    {
+        Dispatcher.Invoke(async () =>
+        {
+            var result = MessageBox.Show(
+                $"\"{deviceName}\" qurilmasi ulanishga ruxsat so'ramoqda.\n\nRuxsat berilsinmi?",
+                "Yangi qurilma so'rovi",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                var approved = _pairingManager.ApproveRequest(connectionId);
+                if (approved is not null)
+                {
+                    await _server.SendToConnectionAsync(
+                        connectionId,
+                        PairResultMessage.Ok("Ulanish tasdiqlandi", approved.Token));
+                    RefreshDevicesList();
+                }
+            }
+            else
+            {
+                _pairingManager.RejectRequest(connectionId);
+                await _server.SendToConnectionAsync(
+                    connectionId,
+                    PairResultMessage.Fail("Ulanish so'rovi kompyuter tomonidan rad etildi"));
+            }
+        });
+    }
 
     private void RefreshDevicesList()
     {

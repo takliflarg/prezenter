@@ -34,6 +34,10 @@ class PresenterWebSocketClient {
     private val _state = MutableStateFlow(ConnectionState.DISCONNECTED)
     val state: StateFlow<ConnectionState> = _state
 
+    /** Oxirgi xatolik matni - ConnectScreen'da foydalanuvchiga aniqroq sabab ko'rsatish uchun. */
+    private val _lastError = MutableStateFlow<String?>(null)
+    val lastError: StateFlow<String?> = _lastError
+
     private val _events = MutableSharedFlow<InboundEnvelope>(extraBufferCapacity = 16)
     val events: SharedFlow<InboundEnvelope> = _events
 
@@ -42,6 +46,7 @@ class PresenterWebSocketClient {
     fun connect(payload: PairingPayload) {
         pendingPairing = payload
         _state.value = ConnectionState.CONNECTING
+        _lastError.value = null
 
         val request = Request.Builder()
             .url("ws://${payload.ip}:${payload.port}/prezenter/")
@@ -58,12 +63,18 @@ class PresenterWebSocketClient {
                 val envelope = runCatching { json.decodeFromString<InboundEnvelope>(text) }.getOrNull()
                     ?: return
                 if (envelope.type == "pairResult") {
-                    _state.value = if (envelope.success == true) ConnectionState.CONNECTED else ConnectionState.ERROR
+                    if (envelope.success == true) {
+                        _state.value = ConnectionState.CONNECTED
+                    } else {
+                        _lastError.value = envelope.message ?: "Server ulanishni rad etdi"
+                        _state.value = ConnectionState.ERROR
+                    }
                 }
                 _events.tryEmit(envelope)
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                _lastError.value = t.message ?: t::class.simpleName ?: "Noma'lum tarmoq xatosi"
                 _state.value = ConnectionState.ERROR
             }
 

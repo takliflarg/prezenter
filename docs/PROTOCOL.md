@@ -21,6 +21,13 @@ matn frame sifatida yuboriladi.
 { "type": "pair", "token": "BASE64_PAIR_TOKEN", "deviceName": "Ali telefon" }
 ```
 
+`token` maydoni ixtiyoriy (`null` bo'lishi mumkin) - bu tarmoqdan (mDNS/NSD)
+avtomatik topilgan, lekin hali hech qachon tasdiqlanmagan kompyuterga
+ulanishga urinishni bildiradi. Bu holda server darhol rad etmaydi -
+kompyuter foydalanuvchisiga "Ruxsat berilsinmi?" dialogini ko'rsatadi va
+javobni (agar tasdiqlansa, yangi doimiy `token` bilan) keyinroq alohida
+`pairResult` xabarida qaytaradi (pastga qarang).
+
 ```json
 { "type": "command", "action": "NEXT" }
 { "type": "command", "action": "PREV" }
@@ -50,8 +57,14 @@ o'lchami bo'lishidan qat'iy nazar nuqta to'g'ri joyga tushadi.
 ### Server -> Klient
 
 ```json
-{ "type": "pairResult", "success": true, "message": "Ulanish tasdiqlandi" }
+{ "type": "pairResult", "success": true, "message": "Ulanish tasdiqlandi", "token": "BASE64_NEW_PERMANENT_TOKEN" }
 ```
+
+`token` faqat tokensiz (tarmoqdan avtomatik topilgan) qurilma PC'da yangi
+tasdiqlanganda keladi - klient buni saqlab qo'yishi kerak (keyingi
+safar shu tokenni yuborsa, qayta tasdiqlashsiz ulanadi). QR orqali
+pairing qilinganda alohida token qaytarilmaydi - QR kodning o'zidagi
+bir martalik token doimiy tokenga aylanadi.
 
 ```json
 { "type": "status", "connected": true, "computerName": "DESKTOP-ALI", "muted": false, "volume": 62 }

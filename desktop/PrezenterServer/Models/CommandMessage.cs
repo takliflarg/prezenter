@@ -62,9 +62,10 @@ public sealed record StatusMessage(
 public sealed record PairResultMessage(
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("success")] bool Success,
-    [property: JsonPropertyName("message")] string Message)
+    [property: JsonPropertyName("message")] string Message,
+    [property: JsonPropertyName("token")] string? Token = null)
 {
-    public static PairResultMessage Ok(string message) => new("pairResult", true, message);
+    public static PairResultMessage Ok(string message, string? token = null) => new("pairResult", true, message, token);
     public static PairResultMessage Fail(string message) => new("pairResult", false, message);
 }
 

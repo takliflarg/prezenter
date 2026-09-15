@@ -158,6 +158,35 @@ public sealed class WebSocketServer : IAsyncDisposable
         await socket.SendAsync(bytes, WebSocketMessageType.Text, endOfMessage: true, token);
     }
 
+    /// <summary>
+    /// Faqat bitta ulanishga xabar yuboradi - masalan, foydalanuvchi PC'da
+    /// tasdiqlash/rad etish tugmasini bosgandan keyin pairing natijasini
+    /// aynan o'sha telefonga qaytarish uchun ishlatiladi.
+    /// </summary>
+    public async Task<bool> SendToConnectionAsync(string connectionId, object payload)
+    {
+        WebSocket? socket;
+        lock (_lock)
+        {
+            _connections.TryGetValue(connectionId, out socket);
+        }
+
+        if (socket is null || socket.State != WebSocketState.Open)
+        {
+            return false;
+        }
+
+        try
+        {
+            await SendAsync(socket, payload, CancellationToken.None);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     /// <summary>Barcha ulangan qurilmalarga status yuborish (masalan, ovoz o'zgarganda).</summary>
     public async Task BroadcastAsync(object payload)
     {

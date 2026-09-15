@@ -31,11 +31,20 @@ public sealed class PairingManager
     private readonly object _lock = new();
     private readonly Dictionary<string, ApprovedDevice> _approvedByToken = new();
     private readonly Dictionary<string, string> _pairedConnections = new(); // connectionId -> token
+    private readonly Dictionary<string, string> _pendingApprovals = new(); // connectionId -> deviceName
 
     private string? _pendingChallengeToken;
     private DateTime _pendingChallengeExpiresUtc;
 
     public event Action<ApprovedDevice>? DeviceApproved;
+
+    /// <summary>
+    /// Tokensiz (masalan, tarmoqda avtomatik topilgan, lekin hali
+    /// hech qachon tasdiqlanmagan) qurilmadan ulanish so'rovi kelganda
+    /// ko'tariladi - MainWindow buni ushlab, foydalanuvchiga
+    /// "Ruxsat berilsinmi?" dialogini ko'rsatadi.
+    /// </summary>
+    public event Action<string, string>? ApprovalRequested;
 
     public PairingManager()
     {
@@ -93,11 +102,64 @@ public sealed class PairingManager
         }
     }
 
+    /// <summary>
+    /// Hech qanday tokeni bo'lmagan qurilma (masalan, tarmoqdan birinchi
+    /// marta topilib, foydalanuvchi ro'yxatdan bosgan) ulanish so'ramoqda -
+    /// bu darhol rad etilmaydi, o'rniga foydalanuvchi tasdiqlashini kutadi.
+    /// </summary>
+    public void RequestApproval(string connectionId, string deviceName)
+    {
+        lock (_lock)
+        {
+            _pendingApprovals[connectionId] = deviceName;
+        }
+
+        ApprovalRequested?.Invoke(connectionId, deviceName);
+    }
+
+    /// <summary>Foydalanuvchi PC'da "Ruxsat berish"ni bosdi - yangi doimiy token yaratiladi.</summary>
+    public ApprovedDevice? ApproveRequest(string connectionId)
+    {
+        lock (_lock)
+        {
+            if (!_pendingApprovals.TryGetValue(connectionId, out var deviceName))
+            {
+                return null;
+            }
+
+            _pendingApprovals.Remove(connectionId);
+
+            var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
+            var approved = new ApprovedDevice(token, deviceName, DateTime.UtcNow);
+            _approvedByToken[token] = approved;
+            _pairedConnections[connectionId] = token;
+            Save();
+            DeviceApproved?.Invoke(approved);
+            return approved;
+        }
+    }
+
+    /// <summary>Foydalanuvchi PC'da "Rad etish"ni bosdi.</summary>
+    public string? RejectRequest(string connectionId)
+    {
+        lock (_lock)
+        {
+            if (!_pendingApprovals.TryGetValue(connectionId, out var deviceName))
+            {
+                return null;
+            }
+
+            _pendingApprovals.Remove(connectionId);
+            return deviceName;
+        }
+    }
+
     public void Disconnect(string connectionId)
     {
         lock (_lock)
         {
             _pairedConnections.Remove(connectionId);
+            _pendingApprovals.Remove(connectionId);
         }
     }
 

@@ -77,12 +77,23 @@ public sealed class CommandDispatcher
         }
     }
 
-    private object HandlePair(string connectionId, InboundMessage message)
+    private object? HandlePair(string connectionId, InboundMessage message)
     {
-        var ok = _pairingManager.TryPair(connectionId, message.Token, message.DeviceName ?? "Noma'lum qurilma");
-        return ok
-            ? PairResultMessage.Ok("Ulanish tasdiqlandi")
-            : PairResultMessage.Fail("Pairing tokeni noto'g'ri yoki muddati tugagan");
+        var deviceName = message.DeviceName ?? "Noma'lum qurilma";
+
+        if (!string.IsNullOrWhiteSpace(message.Token))
+        {
+            return _pairingManager.TryPair(connectionId, message.Token, deviceName)
+                ? PairResultMessage.Ok("Ulanish tasdiqlandi")
+                : PairResultMessage.Fail("Pairing tokeni noto'g'ri yoki muddati tugagan");
+        }
+
+        // Token yo'q - masalan, telefon tarmoqda avtomatik topilgan
+        // kompyuterni ro'yxatdan tanladi. Darhol rad etish o'rniga,
+        // kompyuter foydalanuvchisidan tasdiq so'raymiz (javob keyinroq,
+        // MainWindow orqali shu ulanishga alohida yuboriladi).
+        _pairingManager.RequestApproval(connectionId, deviceName);
+        return null;
     }
 
     private object? HandleCommand(string? action)

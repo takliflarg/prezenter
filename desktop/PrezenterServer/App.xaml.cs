@@ -37,6 +37,8 @@ public partial class App : Application
             _server = new WebSocketServer(dispatcher);
             _advertiser = new MdnsAdvertiser();
 
+            FirewallHelper.EnsureInboundRuleExists(WebSocketServer.Port);
+
             _server.Start();
 
             try
